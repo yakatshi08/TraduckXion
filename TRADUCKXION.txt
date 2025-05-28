@@ -1,0 +1,805 @@
+import React, { createContext, useState, useContext, useEffect } from 'react';
+import { Globe, Home, FileText, Edit3, Mic, Settings, LogOut, Youtube, Eye, Clock } from 'lucide-react';
+
+// Translations data
+const translations = {
+  fr: {
+    logoSubtitle: "Transcribe & Translate",
+    navHome: "Accueil",
+    navMyTranscriptions: "Mes Transcriptions",
+    navNewTranscription: "Nouvelle Transcription",
+    navNewTranslation: "Nouvelle Traduction",
+    navSettings: "Paramètres",
+    navLogout: "Déconnexion",
+    dashboardTitle: "Tableau de Bord",
+    dashboardSubtitle: "Bienvenue sur Traduck'Xion ! Gérez vos transcriptions et traductions.",
+    cardTitleNewTranscription: "Nouvelle Transcription",
+    cardDescNewTranscription: "Téléchargez un fichier audio/vidéo ou enregistrez directement pour obtenir une transcription.",
+    btnStartTranscription: "Commencer une Transcription",
+    cardTitleNewTranslation: "Nouvelle Traduction",
+    cardDescNewTranslation: "Traduisez du texte ou des documents transcrits dans plusieurs langues.",
+    btnStartTranslation: "Démarrer une Traduction",
+    cardTitleYoutube: "Depuis YouTube",
+    cardDescYoutube: "Importez une vidéo YouTube pour la transcrire et la traduire directement.",
+    btnImportYoutube: "Importer une URL YouTube",
+    historyTitle: "Mon Historique Récent",
+    historyItem1Title: "Transcription: Réunion Projet Alpha",
+    historyItem1Desc: "Audio_001.mp3 - 10 Mai 2025, 14:30",
+    historyItem2Title: "Traduction: Document Marketing EN > FR",
+    historyItem2Desc: "Marketing_Brief_EN.docx - 09 Mai 2025, 10:15",
+    historyItem3Title: "Transcription: Interview CEO",
+    historyItem3Desc: "Youtube_Link_XYZ.mp4 - 08 Mai 2025, 16:00",
+    btnView: "Voir",
+    btnInProgress: "En cours...",
+    footerRights: "© 2025 Traduck'Xion. Tous droits réservés.",
+    tooltipVoiceInput: "Activer la saisie vocale",
+    // Nouvelles traductions pour les pages
+    myTranscriptionsTitle: "Mes Transcriptions",
+    myTranscriptionsEmpty: "Aucune transcription pour le moment.",
+    newTranscriptionTitle: "Nouvelle Transcription",
+    uploadFile: "Télécharger un fichier",
+    recordAudio: "Enregistrer",
+    newTranslationTitle: "Nouvelle Traduction",
+    sourceText: "Texte source",
+    targetLanguage: "Langue cible",
+    translateBtn: "Traduire",
+    settingsTitle: "Paramètres",
+    accountSettings: "Paramètres du compte",
+    appSettings: "Paramètres de l'application",
+    youtubeImportTitle: "Importer depuis YouTube",
+    youtubeUrlPlaceholder: "Collez l'URL YouTube ici",
+    importBtn: "Importer",
+    processingMessage: "Traitement en cours..."
+  },
+  en: {
+    logoSubtitle: "Transcribe & Translate",
+    navHome: "Home",
+    navMyTranscriptions: "My Transcriptions",
+    navNewTranscription: "New Transcription",
+    navNewTranslation: "New Translation",
+    navSettings: "Settings",
+    navLogout: "Logout",
+    dashboardTitle: "Dashboard",
+    dashboardSubtitle: "Welcome to Traduck'Xion! Manage your transcriptions and translations.",
+    cardTitleNewTranscription: "New Transcription",
+    cardDescNewTranscription: "Upload an audio/video file or record directly to get a transcription.",
+    btnStartTranscription: "Start Transcription",
+    cardTitleNewTranslation: "New Translation",
+    cardDescNewTranslation: "Translate text or transcribed documents into multiple languages.",
+    btnStartTranslation: "Start Translation",
+    cardTitleYoutube: "From YouTube",
+    cardDescYoutube: "Import a YouTube video to transcribe and translate it directly.",
+    btnImportYoutube: "Import YouTube URL",
+    historyTitle: "My Recent History",
+    historyItem1Title: "Transcription: Project Alpha Meeting",
+    historyItem1Desc: "Audio_001.mp3 - May 10, 2025, 2:30 PM",
+    historyItem2Title: "Translation: Marketing Document EN > FR",
+    historyItem2Desc: "Marketing_Brief_EN.docx - May 09, 2025, 10:15 AM",
+    historyItem3Title: "Transcription: CEO Interview",
+    historyItem3Desc: "Youtube_Link_XYZ.mp4 - May 08, 2025, 4:00 PM",
+    btnView: "View",
+    btnInProgress: "In Progress...",
+    footerRights: "© 2025 Traduck'Xion. All rights reserved.",
+    tooltipVoiceInput: "Enable voice input",
+    // New translations for pages
+    myTranscriptionsTitle: "My Transcriptions",
+    myTranscriptionsEmpty: "No transcriptions yet.",
+    newTranscriptionTitle: "New Transcription",
+    uploadFile: "Upload File",
+    recordAudio: "Record",
+    newTranslationTitle: "New Translation",
+    sourceText: "Source Text",
+    targetLanguage: "Target Language",
+    translateBtn: "Translate",
+    settingsTitle: "Settings",
+    accountSettings: "Account Settings",
+    appSettings: "App Settings",
+    youtubeImportTitle: "Import from YouTube",
+    youtubeUrlPlaceholder: "Paste YouTube URL here",
+    importBtn: "Import",
+    processingMessage: "Processing..."
+  }
+};
+
+// Language Context
+const LanguageContext = createContext({
+  language: 'fr',
+  setLanguage: () => {},
+  t: (key) => key,
+});
+
+const useLanguage = () => useContext(LanguageContext);
+
+const LanguageProvider = ({ children }) => {
+  const [language, setLanguage] = useState('fr');
+
+  const t = (key) => {
+    if (translations[language] && translations[language][key]) {
+      return translations[language][key];
+    }
+    return key;
+  };
+
+  return (
+    <LanguageContext.Provider value={{ language, setLanguage, t }}>
+      {children}
+    </LanguageContext.Provider>
+  );
+};
+
+// Simple Router Context
+const RouterContext = createContext({
+  currentPage: 'home',
+  navigate: () => {}
+});
+
+const useRouter = () => useContext(RouterContext);
+
+const RouterProvider = ({ children }) => {
+  const [currentPage, setCurrentPage] = useState('home');
+
+  const navigate = (page) => {
+    setCurrentPage(page);
+    window.scrollTo(0, 0);
+  };
+
+  return (
+    <RouterContext.Provider value={{ currentPage, navigate }}>
+      {children}
+    </RouterContext.Provider>
+  );
+};
+
+// Logo Component
+const LogoComponent = () => {
+  return (
+    <h1 className="text-[1.75rem] font-bold italic">
+      <span className="text-[#D1D1D1]">Traduck'</span>
+      <span className="text-[#0A3D91] inline-block animate-pulse" style={{ 
+        fontFamily: 'Georgia, serif',
+        fontSize: '1.85rem',
+        lineHeight: '1',
+        verticalAlign: 'baseline',
+        transform: 'translateY(0.05rem)',
+        letterSpacing: '-0.05rem'
+      }}>X</span>
+      <span className="text-[#D1D1D1]">ion</span>
+    </h1>
+  );
+};
+
+// Language Selector Component
+const LanguageSelector = () => {
+  const { language, setLanguage } = useLanguage();
+
+  return (
+    <div className="text-sm text-[#60A5FA] flex items-center">
+      <button 
+        className={`px-2 py-1 hover:text-white ${language === 'fr' ? 'text-white font-semibold' : ''}`}
+        onClick={() => setLanguage('fr')}
+      >
+        FR
+      </button>
+      <span className="text-[#64748B]">|</span>
+      <button 
+        className={`px-2 py-1 hover:text-white ${language === 'en' ? 'text-white font-semibold' : ''}`}
+        onClick={() => setLanguage('en')}
+      >
+        EN
+      </button>
+    </div>
+  );
+};
+
+// Sidebar Component
+const Sidebar = () => {
+  const { t } = useLanguage();
+  const { currentPage, navigate } = useRouter();
+
+  const navItems = [
+    { id: 'home', icon: Home, label: 'navHome' },
+    { id: 'transcriptions', icon: FileText, label: 'navMyTranscriptions' },
+    { id: 'new-transcription', icon: Edit3, label: 'navNewTranscription' },
+    { id: 'new-translation', icon: Globe, label: 'navNewTranslation' }
+  ];
+
+  const handleLogout = () => {
+    alert('Déconnexion... (à implémenter)');
+  };
+
+  return (
+    <aside className="w-64 bg-[#1E293B] p-6 space-y-8 flex flex-col fixed top-0 left-0 h-full z-10 shadow-lg" style={{ backgroundColor: '#1E293B' }}>
+      <div className="text-center py-4">
+        <LogoComponent />
+        <p className="text-xs text-[#64748B] mt-1" style={{ color: '#64748B' }}>{t('logoSubtitle')}</p>
+      </div>
+
+      <nav className="flex-grow">
+        <ul className="space-y-3">
+          {navItems.map(({ id, icon: Icon, label }) => (
+            <li key={id}>
+              <button
+                onClick={() => navigate(id)}
+                className={`w-full flex items-center space-x-3 py-2 px-3 rounded-lg transition-colors duration-200 text-sm font-medium ${
+                  currentPage === id 
+                    ? 'bg-[#0A3D91]/30 text-white' 
+                    : 'text-[#60A5FA] hover:text-white hover:bg-[#0A3D91]/30'
+                }`}
+                style={{ 
+                  color: currentPage === id ? '#FFFFFF' : '#60A5FA',
+                  backgroundColor: currentPage === id ? 'rgba(10, 61, 145, 0.3)' : 'transparent'
+                }}
+              >
+                <Icon className="w-5 h-5" />
+                <span className="whitespace-nowrap">{t(label)}</span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      </nav>
+
+      <div className="mt-auto">
+        <button
+          onClick={() => navigate('settings')}
+          className="w-full flex items-center space-x-3 text-[#60A5FA] hover:text-white hover:bg-[#0A3D91]/30 py-2 px-3 rounded-lg transition-colors duration-200 text-sm font-medium" 
+          style={{ color: '#60A5FA' }}
+        >
+          <Settings className="w-5 h-5" />
+          <span className="whitespace-nowrap">{t('navSettings')}</span>
+        </button>
+        <button
+          onClick={handleLogout}
+          className="w-full flex items-center space-x-3 text-[#60A5FA] hover:text-white hover:bg-[#0A3D91]/30 py-2 px-3 rounded-lg transition-colors duration-200 text-sm font-medium mt-2" 
+          style={{ color: '#60A5FA' }}
+        >
+          <LogOut className="w-5 h-5" />
+          <span className="whitespace-nowrap">{t('navLogout')}</span>
+        </button>
+      </div>
+    </aside>
+  );
+};
+
+// Action Cards Component
+const ActionCards = () => {
+  const { t } = useLanguage();
+  const { navigate } = useRouter();
+
+  const handleVoiceInputClick = (e) => {
+    e.preventDefault();
+    alert(t('tooltipVoiceInput') + ' (fonctionnalité à implémenter)');
+  };
+
+  return (
+    <section className="grid grid-cols-3 gap-2 mb-8">
+      <div className="p-6 rounded-xl shadow-lg hover:shadow-2xl transition-shadow duration-300 flex flex-col" style={{ backgroundColor: 'rgba(10, 61, 145, 0.3)' }}>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold whitespace-nowrap overflow-hidden text-ellipsis" style={{ color: '#FFFFFF' }}>{t('cardTitleNewTranscription')}</h3>
+          <Edit3 className="w-4 h-4" style={{ color: '#3B82F6' }} />
+        </div>
+        <p className="text-sm mb-4 flex-grow" style={{ color: '#64748B' }}>{t('cardDescNewTranscription')}</p>
+        <button 
+          onClick={() => navigate('new-transcription')}
+          className="w-full font-medium py-3 px-2 rounded-md transition duration-200 whitespace-nowrap text-sm hover:opacity-90" 
+          style={{ backgroundColor: '#0A3D91', color: '#FFFFFF' }}
+        >
+          {t('btnStartTranscription')}
+        </button>
+      </div>
+
+      <div className="p-6 rounded-xl shadow-lg hover:shadow-2xl transition-shadow duration-300 flex flex-col" style={{ backgroundColor: 'rgba(10, 61, 145, 0.3)' }}>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold whitespace-nowrap overflow-hidden text-ellipsis" style={{ color: '#FFFFFF' }}>{t('cardTitleNewTranslation')}</h3>
+          <button onClick={handleVoiceInputClick} title={t('tooltipVoiceInput')}>
+            <Mic className="w-5 h-5" style={{ color: '#F57C00' }} />
+          </button>
+        </div>
+        <p className="text-sm mb-4 flex-grow" style={{ color: '#64748B' }}>{t('cardDescNewTranslation')}</p>
+        <button 
+          onClick={() => navigate('new-translation')}
+          className="w-full font-medium py-3 px-2 rounded-md transition duration-200 whitespace-nowrap text-sm hover:opacity-90" 
+          style={{ backgroundColor: '#0A3D91', color: '#FFFFFF' }}
+        >
+          {t('btnStartTranslation')}
+        </button>
+      </div>
+
+      <div className="p-6 rounded-xl shadow-lg hover:shadow-2xl transition-shadow duration-300 flex flex-col" style={{ backgroundColor: 'rgba(10, 61, 145, 0.3)' }}>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold whitespace-nowrap overflow-hidden text-ellipsis" style={{ color: '#FFFFFF' }}>{t('cardTitleYoutube')}</h3>
+          <Youtube className="w-4 h-4" style={{ color: '#EF4444' }} />
+        </div>
+        <p className="text-sm mb-4 flex-grow" style={{ color: '#64748B' }}>{t('cardDescYoutube')}</p>
+        <button 
+          onClick={() => navigate('youtube-import')}
+          className="w-full font-medium py-3 px-2 rounded-md transition duration-200 whitespace-nowrap text-sm hover:opacity-90" 
+          style={{ backgroundColor: '#0A3D91', color: '#FFFFFF' }}
+        >
+          {t('btnImportYoutube')}
+        </button>
+      </div>
+    </section>
+  );
+};
+
+// History Section Component
+const HistorySection = () => {
+  const { t } = useLanguage();
+  const { navigate } = useRouter();
+
+  const handleViewItem = (itemId) => {
+    alert(`Affichage de l'élément ${itemId} (à implémenter)`);
+  };
+
+  return (
+    <section>
+      <h3 className="text-xl font-semibold mb-4" style={{ color: '#FFFFFF' }}>{t('historyTitle')}</h3>
+      <div className="p-4 rounded-xl shadow-lg" style={{ backgroundColor: '#1F2937' }}>
+        <ul className="space-y-3">
+          <li id="rect-1" className="flex justify-between items-center p-3 rounded-lg transition-colors duration-200" style={{ backgroundColor: 'rgba(10, 61, 145, 0.3)' }}>
+            <div>
+              <p className="text-sm font-medium" style={{ color: '#FFFFFF' }}>{t('historyItem1Title')}</p>
+              <p className="text-xs" style={{ color: '#64748B' }}>{t('historyItem1Desc')}</p>
+            </div>
+            <button 
+              onClick={() => handleViewItem(1)}
+              className="px-3 py-1 text-xs rounded-md transition duration-200 hover:opacity-90" 
+              style={{ backgroundColor: '#3B82F6', color: '#FFFFFF' }}
+            >
+              {t('btnView')}
+            </button>
+          </li>
+          <li id="rect-2" className="flex justify-between items-center p-3 rounded-lg transition-colors duration-200" style={{ backgroundColor: 'rgba(10, 61, 145, 0.3)' }}>
+            <div>
+              <p className="text-sm font-medium" style={{ color: '#FFFFFF' }}>{t('historyItem2Title')}</p>
+              <p className="text-xs" style={{ color: '#64748B' }}>{t('historyItem2Desc')}</p>
+            </div>
+            <button 
+              onClick={() => handleViewItem(2)}
+              className="px-3 py-1 text-xs rounded-md transition duration-200 hover:opacity-90" 
+              style={{ backgroundColor: '#3B82F6', color: '#FFFFFF' }}
+            >
+              {t('btnView')}
+            </button>
+          </li>
+          <li id="rect-3" className="flex justify-between items-center p-3 rounded-lg transition-colors duration-200" style={{ backgroundColor: 'rgba(10, 61, 145, 0.3)' }}>
+            <div>
+              <p className="text-sm font-medium" style={{ color: '#FFFFFF' }}>{t('historyItem3Title')}</p>
+              <p className="text-xs" style={{ color: '#64748B' }}>{t('historyItem3Desc')}</p>
+            </div>
+            <button className="px-3 py-1 text-xs rounded-md cursor-not-allowed" style={{ backgroundColor: '#64748B', color: '#FFFFFF' }}>
+              {t('btnInProgress')}
+            </button>
+          </li>
+        </ul>
+      </div>
+    </section>
+  );
+};
+
+// Dashboard Component
+const Dashboard = () => {
+  const { t } = useLanguage();
+
+  return (
+    <>
+      <header className="mb-8 flex justify-between items-start">
+        <div>
+          <h2 className="text-3xl font-semibold italic" style={{ color: '#D1D1D1' }}>{t('dashboardTitle')}</h2>
+          <p className="text-sm mt-1" style={{ color: '#64748B' }}>{t('dashboardSubtitle')}</p>
+        </div>
+        <LanguageSelector />
+      </header>
+
+      <ActionCards />
+      <HistorySection />
+    </>
+  );
+};
+
+// My Transcriptions Page
+const MyTranscriptions = () => {
+  const { t } = useLanguage();
+  const { navigate } = useRouter();
+
+  const transcriptions = [
+    { id: 1, title: "Réunion Projet Alpha", date: "10 Mai 2025", duration: "45:30", status: "completed" },
+    { id: 2, title: "Interview CEO", date: "08 Mai 2025", duration: "1:12:45", status: "processing" },
+    { id: 3, title: "Conférence Tech", date: "05 Mai 2025", duration: "2:05:15", status: "completed" }
+  ];
+
+  return (
+    <div>
+      <header className="mb-8 flex justify-between items-start">
+        <h2 className="text-3xl font-semibold italic" style={{ color: '#D1D1D1' }}>{t('myTranscriptionsTitle')}</h2>
+        <LanguageSelector />
+      </header>
+
+      <div className="grid gap-4">
+        {transcriptions.map((item) => (
+          <div key={item.id} className="p-6 rounded-xl shadow-lg" style={{ backgroundColor: '#1F2937' }}>
+            <div className="flex justify-between items-center">
+              <div>
+                <h3 className="text-lg font-semibold mb-2" style={{ color: '#FFFFFF' }}>{item.title}</h3>
+                <p className="text-sm" style={{ color: '#64748B' }}>
+                  {item.date} • Durée: {item.duration}
+                </p>
+              </div>
+              <div className="flex items-center space-x-2">
+                {item.status === 'completed' ? (
+                  <Eye className="w-5 h-5" style={{ color: '#3B82F6' }} />
+                ) : (
+                  <Clock className="w-5 h-5 animate-spin" style={{ color: '#F57C00' }} />
+                )}
+                <button 
+                  className="px-4 py-2 text-sm rounded-md transition duration-200 hover:opacity-90"
+                  style={{ 
+                    backgroundColor: item.status === 'completed' ? '#3B82F6' : '#64748B', 
+                    color: '#FFFFFF' 
+                  }}
+                >
+                  {item.status === 'completed' ? t('btnView') : t('btnInProgress')}
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// New Transcription Page
+const NewTranscription = () => {
+  const { t } = useLanguage();
+  const [isRecording, setIsRecording] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
+
+  const handleFileSelect = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setSelectedFile(file);
+      alert(`Fichier sélectionné: ${file.name}`);
+    }
+  };
+
+  const handleRecord = () => {
+    setIsRecording(!isRecording);
+    alert(isRecording ? 'Arrêt de l\'enregistrement...' : 'Début de l\'enregistrement...');
+  };
+
+  const handleSubmit = () => {
+    if (selectedFile || isRecording) {
+      alert('Transcription en cours de traitement...');
+    } else {
+      alert('Veuillez sélectionner un fichier ou enregistrer de l\'audio');
+    }
+  };
+
+  return (
+    <div>
+      <header className="mb-8 flex justify-between items-start">
+        <h2 className="text-3xl font-semibold italic" style={{ color: '#D1D1D1' }}>{t('newTranscriptionTitle')}</h2>
+        <LanguageSelector />
+      </header>
+
+      <div className="max-w-2xl mx-auto">
+        <div className="p-8 rounded-xl shadow-lg" style={{ backgroundColor: '#1F2937' }}>
+          <div className="space-y-6">
+            <div>
+              <label className="block text-sm font-medium mb-2" style={{ color: '#FFFFFF' }}>
+                {t('uploadFile')}
+              </label>
+              <input 
+                type="file" 
+                accept="audio/*,video/*"
+                onChange={handleFileSelect}
+                className="w-full p-3 rounded-md border-2 border-dashed"
+                style={{ 
+                  backgroundColor: '#111827', 
+                  borderColor: '#64748B',
+                  color: '#FFFFFF'
+                }}
+              />
+              {selectedFile && (
+                <p className="mt-2 text-sm" style={{ color: '#3B82F6' }}>
+                  Fichier: {selectedFile.name}
+                </p>
+              )}
+            </div>
+
+            <div className="text-center py-4">
+              <p className="text-sm mb-4" style={{ color: '#64748B' }}>ou</p>
+              <button
+                onClick={handleRecord}
+                className={`px-6 py-3 rounded-full transition duration-200 flex items-center justify-center mx-auto ${
+                  isRecording ? 'animate-pulse' : ''
+                }`}
+                style={{ 
+                  backgroundColor: isRecording ? '#EF4444' : '#0A3D91', 
+                  color: '#FFFFFF' 
+                }}
+              >
+                <Mic className="w-5 h-5 mr-2" />
+                {isRecording ? 'Arrêter' : t('recordAudio')}
+              </button>
+            </div>
+
+            <button
+              onClick={handleSubmit}
+              className="w-full py-3 rounded-md font-medium transition duration-200 hover:opacity-90"
+              style={{ backgroundColor: '#0A3D91', color: '#FFFFFF' }}
+            >
+              {t('btnStartTranscription')}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// New Translation Page
+const NewTranslation = () => {
+  const { t } = useLanguage();
+  const [sourceText, setSourceText] = useState('');
+  const [targetLang, setTargetLang] = useState('en');
+
+  const handleTranslate = () => {
+    if (sourceText.trim()) {
+      alert(`Traduction en cours vers ${targetLang}...`);
+    } else {
+      alert('Veuillez entrer du texte à traduire');
+    }
+  };
+
+  return (
+    <div>
+      <header className="mb-8 flex justify-between items-start">
+        <h2 className="text-3xl font-semibold italic" style={{ color: '#D1D1D1' }}>{t('newTranslationTitle')}</h2>
+        <LanguageSelector />
+      </header>
+
+      <div className="max-w-4xl mx-auto">
+        <div className="grid grid-cols-2 gap-4">
+          <div className="p-6 rounded-xl shadow-lg" style={{ backgroundColor: '#1F2937' }}>
+            <label className="block text-sm font-medium mb-2" style={{ color: '#FFFFFF' }}>
+              {t('sourceText')}
+            </label>
+            <textarea
+              value={sourceText}
+              onChange={(e) => setSourceText(e.target.value)}
+              className="w-full h-64 p-4 rounded-md resize-none"
+              style={{ 
+                backgroundColor: '#111827', 
+                color: '#FFFFFF',
+                border: '1px solid #64748B'
+              }}
+              placeholder="Entrez votre texte ici..."
+            />
+          </div>
+
+          <div className="p-6 rounded-xl shadow-lg" style={{ backgroundColor: '#1F2937' }}>
+            <div className="mb-4">
+              <label className="block text-sm font-medium mb-2" style={{ color: '#FFFFFF' }}>
+                {t('targetLanguage')}
+              </label>
+              <select
+                value={targetLang}
+                onChange={(e) => setTargetLang(e.target.value)}
+                className="w-full p-2 rounded-md"
+                style={{ 
+                  backgroundColor: '#111827', 
+                  color: '#FFFFFF',
+                  border: '1px solid #64748B'
+                }}
+              >
+                <option value="en">English</option>
+                <option value="fr">Français</option>
+                <option value="es">Español</option>
+                <option value="de">Deutsch</option>
+                <option value="it">Italiano</option>
+              </select>
+            </div>
+            <div className="h-52 p-4 rounded-md" style={{ backgroundColor: '#111827', border: '1px solid #64748B' }}>
+              <p className="text-sm" style={{ color: '#64748B' }}>
+                La traduction apparaîtra ici...
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <button
+          onClick={handleTranslate}
+          className="w-full mt-6 py-3 rounded-md font-medium transition duration-200 hover:opacity-90"
+          style={{ backgroundColor: '#0A3D91', color: '#FFFFFF' }}
+        >
+          {t('translateBtn')}
+        </button>
+      </div>
+    </div>
+  );
+};
+
+// YouTube Import Page
+const YoutubeImport = () => {
+  const { t } = useLanguage();
+  const [youtubeUrl, setYoutubeUrl] = useState('');
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  const handleImport = () => {
+    if (youtubeUrl.trim()) {
+      setIsProcessing(true);
+      setTimeout(() => {
+        alert('Vidéo importée avec succès!');
+        setIsProcessing(false);
+      }, 2000);
+    } else {
+      alert('Veuillez entrer une URL YouTube valide');
+    }
+  };
+
+  return (
+    <div>
+      <header className="mb-8 flex justify-between items-start">
+        <h2 className="text-3xl font-semibold italic" style={{ color: '#D1D1D1' }}>{t('youtubeImportTitle')}</h2>
+        <LanguageSelector />
+      </header>
+
+      <div className="max-w-2xl mx-auto">
+        <div className="p-8 rounded-xl shadow-lg" style={{ backgroundColor: '#1F2937' }}>
+          <div className="space-y-6">
+            <div className="flex items-center justify-center mb-6">
+              <Youtube className="w-16 h-16" style={{ color: '#EF4444' }} />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-2" style={{ color: '#FFFFFF' }}>
+                URL YouTube
+              </label>
+              <input
+                type="url"
+                value={youtubeUrl}
+                onChange={(e) => setYoutubeUrl(e.target.value)}
+                placeholder={t('youtubeUrlPlaceholder')}
+                className="w-full p-3 rounded-md"
+                style={{ 
+                  backgroundColor: '#111827', 
+                  color: '#FFFFFF',
+                  border: '1px solid #64748B'
+                }}
+              />
+            </div>
+
+            <button
+              onClick={handleImport}
+              disabled={isProcessing}
+              className="w-full py-3 rounded-md font-medium transition duration-200 hover:opacity-90 disabled:opacity-50"
+              style={{ backgroundColor: '#0A3D91', color: '#FFFFFF' }}
+            >
+              {isProcessing ? t('processingMessage') : t('importBtn')}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Settings Page
+const Settings = () => {
+  const { t } = useLanguage();
+
+  return (
+    <div>
+      <header className="mb-8 flex justify-between items-start">
+        <h2 className="text-3xl font-semibold italic" style={{ color: '#D1D1D1' }}>{t('settingsTitle')}</h2>
+        <LanguageSelector />
+      </header>
+
+      <div className="grid gap-6">
+        <div className="p-6 rounded-xl shadow-lg" style={{ backgroundColor: '#1F2937' }}>
+          <h3 className="text-xl font-semibold mb-4" style={{ color: '#FFFFFF' }}>{t('accountSettings')}</h3>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium mb-2" style={{ color: '#64748B' }}>Email</label>
+              <input 
+                type="email" 
+                value="user@example.com" 
+                readOnly
+                className="w-full p-2 rounded-md"
+                style={{ backgroundColor: '#111827', color: '#FFFFFF', border: '1px solid #64748B' }}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-2" style={{ color: '#64748B' }}>Nom</label>
+              <input 
+                type="text" 
+                value="Jean Dupont" 
+                readOnly
+                className="w-full p-2 rounded-md"
+                style={{ backgroundColor: '#111827', color: '#FFFFFF', border: '1px solid #64748B' }}
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="p-6 rounded-xl shadow-lg" style={{ backgroundColor: '#1F2937' }}>
+          <h3 className="text-xl font-semibold mb-4" style={{ color: '#FFFFFF' }}>{t('appSettings')}</h3>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <span style={{ color: '#64748B' }}>Notifications</span>
+              <input type="checkbox" defaultChecked className="rounded" />
+            </div>
+            <div className="flex items-center justify-between">
+              <span style={{ color: '#64748B' }}>Mode sombre</span>
+              <input type="checkbox" defaultChecked className="rounded" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Main Content Component
+const MainContent = () => {
+  const { t } = useLanguage();
+  const { currentPage } = useRouter();
+
+  const renderPage = () => {
+    switch(currentPage) {
+      case 'home':
+        return <Dashboard />;
+      case 'transcriptions':
+        return <MyTranscriptions />;
+      case 'new-transcription':
+        return <NewTranscription />;
+      case 'new-translation':
+        return <NewTranslation />;
+      case 'youtube-import':
+        return <YoutubeImport />;
+      case 'settings':
+        return <Settings />;
+      default:
+        return <Dashboard />;
+    }
+  };
+
+  return (
+    <main className="flex-1 ml-64 p-8 overflow-y-auto min-h-screen" style={{ backgroundColor: '#111827' }}>
+      <div className="max-w-7xl mx-auto">
+        {renderPage()}
+        
+        <footer className="mt-12 text-center">
+          <p className="text-xs" style={{ color: '#64748B' }}>{t('footerRights')}</p>
+        </footer>
+      </div>
+    </main>
+  );
+};
+
+// Main App Component
+function App() {
+  // Ajout du style global pour le thème sombre
+  React.useEffect(() => {
+    // Application du thème sombre sur le body
+    document.body.style.backgroundColor = '#111827';
+    document.body.style.color = '#FFFFFF';
+    document.body.style.margin = '0';
+    document.body.style.fontFamily = "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
+  }, []);
+
+  return (
+    <LanguageProvider>
+      <RouterProvider>
+        <div className="flex h-screen overflow-hidden" style={{ backgroundColor: '#111827' }}>
+          <Sidebar />
+          <MainContent />
+        </div>
+      </RouterProvider>
+    </LanguageProvider>
+  );
+}
+
+export default App;

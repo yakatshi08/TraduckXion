@@ -1,0 +1,131 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@1,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@1,700&display=swap');
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: #111827; /* Fond principal */
+  color: #FFFFFF; /* Texte blanc par défaut pour les éléments non spécifiquement stylés */
+}
+
+@keyframes subtleShimmer {
+  0%, 100% {
+      text-shadow: 0 0 2px rgba(10, 61, 145, 0.3), 0 0 5px rgba(10, 61, 145, 0.2);
+  }
+  50% {
+      text-shadow: 0 0 5px rgba(10, 61, 145, 0.5), 0 0 10px rgba(10, 61, 145, 0.3);
+  }
+}
+
+/* Styles pour le nouveau logo */
+.logo-base-style {
+  font-family: 'Exo 2', sans-serif;
+  font-style: italic;
+  font-weight: 700;
+  font-size: 1.75rem; /* 28px */
+  line-height: 1.2;
+}
+
+.logo-main-font {
+  color: #D1D1D1; /* Gris clair pour "Traduck'ion" */
+  font-family: 'Exo 2', sans-serif;
+  font-style: italic;
+}
+.logo-main-font.apostrophe {
+    color: #D1D1D1; /* Gris clair pour l'apostrophe */
+}
+
+.char-x-modified {
+  font-family: 'Merriweather', serif;
+  font-style: italic;
+  font-weight: 700;
+  color: #0A3D91; /* Bleu foncé (#0A3D91) uniquement sur le X */
+  display: inline-block;
+  position: relative;
+  transform: translateY(2px); /* Simule le pied gauche dépassant de 2px */
+}
+.char-x-modified.logo-animated {
+    animation: subtleShimmer 2s infinite ease-in-out;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #1E293B;
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: #3B82F6;
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #60A5FA;
+}
+.language-selector a.active {
+  color: #3B82F6;
+  font-weight: 600;
+}
+
+/* Styles pour les boutons uniformisés */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1rem;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-align: center;
+  transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out, color 0.2s ease-in-out;
+  cursor: pointer;
+  border: 1px solid transparent;
+  line-height: 1;
+  white-space: nowrap;
+}
+.btn-action {
+  min-width: 200px;
+  background-color: #0A3D91; /* Couleur principale Bleu foncé */
+  color: #FFFFFF;
+}
+.btn-action:hover {
+  background-color: #08337A;
+}
+
+.btn-sm {
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+}
+.btn-sm.btn-primary-small {
+  background-color: #3B82F6; /* Couleur originale pour petits boutons primaires */
+  color: #FFFFFF;
+}
+.btn-sm.btn-primary-small:hover {
+  background-color: #2563EB;
+}
+.btn-sm.btn-neutral-small {
+  background-color: #64748B; /* Couleur originale pour petits boutons neutres */
+  color: #FFFFFF;
+}
+.btn-sm.btn-neutral-small:hover {
+  background-color: #475569;
+}
+
+/* Style pour le titre "Tableau de Bord" */
+.main-title {
+  font-family: 'Exo 2', sans-serif;
+  font-style: italic;
+  font-weight: 700;
+  color: #D1D1D1; /* Gris clair demandé */
+}
+
+/* Style pour l'icône cliquable avec tooltip */
+.clickable-icon-wrapper {
+  position: relative; /* Nécessaire pour le positionnement du tooltip si on utilisait un tooltip CSS custom */
+  display: inline-block; /* Pour que le wrapper ne prenne que la taille de l'icône */
+}
